@@ -204,8 +204,21 @@ public class QueryFunction {
 		
 		return someMat;
 	}
+	
 	// insert timestable
-	protected static void insertTimeTable(String classroom, Connection con) throws SQLException{
+	protected static void insertTimeTable(
+			String classroom,Connection con,
+			List<String> lundiCour, 
+			List<String>mardicour,  
+			List<String>mercrediCour,
+			List<String>jeudiCour,
+			List<String>vendredicour
+			) throws SQLException{
+		
+		String query = "SELECT idClasse FROM Classe WHERE nom=?";
+		PreparedStatement pstmt1 = con.prepareStatement(query);
+		ResultSet res1 = pstmt1.executeQuery();
+		int idClass = res1.getInt("idClasse");
 		
 	}
 	

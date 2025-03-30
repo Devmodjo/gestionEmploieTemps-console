@@ -29,7 +29,7 @@ public class QueryFunction {
 					+ "    mercrediCours TEXT,"
 					+ "    jeudiCours TEXT,"
 					+ "    vendrediCours TEXT,"
-					+ "    FOREIGN KEY (idClasse) REFERENCES Classe(idClasse),"
+					+ "    FOREIGN KEY (idClasse) REFERENCES Classe(idClasse)"
 					+ ");";
 			stmt.execute(emploieTempClasse);
 			// create classroom table
@@ -93,40 +93,53 @@ public class QueryFunction {
 		
 	}
 	
-	// add matiere
-	protected static void insertMatiere(String className, String nomMatiere, Connection con) throws SQLException{
-		// get classroom id
-		String query1 = "SELECT DISTINCT idClasse FROM Classe WHERE nom='" + className+"'";
-		// insert matière
-		String query2 = "INSERT INTO matiere(nom_matiere, idClasse) VALUES(?,?)";
-		// count all mat
-		String query3 = "SELECT DISTINCT COUNT(nom_matiere) FROM matiere";
-		
-		try(Statement stmt = con.createStatement(); PreparedStatement ps = con.prepareStatement(query2)){
-			
-			ResultSet rs = stmt.executeQuery(query1);
-			while (rs.next()) 
-				classID = rs.getInt("idClasse");
-			
-			
-			ResultSet rs2 = stmt.executeQuery(query3);
-			if(rs2.getInt(1) > 14) {
-				System.out.println("INFO: cette classe possede suffisament de matière");
-			}
-			else {
-				// insertion de la matière
-				ps.setString(1, nomMatiere);
-				ps.setInt(2, classID);
-				ps.execute();
-				System.out.println("SUCCESS: Matière "+ nomMatiere+" enregistrez :) !");
-			}	
-			
-			rs2.close();
-			rs.close();
-			
-			
-		}
+	protected static void insertMatiere(String className, String nomMatiere, Connection con) throws SQLException {
+	    // Requête pour récupérer l'ID de la classe
+	    String query1 = "SELECT DISTINCT idClasse FROM Classe WHERE nom = ?";
+	    // Requête pour insérer une matière
+	    String query2 = "INSERT INTO matiere(nom_matiere, idClasse) VALUES(?, ?)";
+	    // Requête pour compter les matières d'une classe
+	    String query3 = "SELECT COUNT(nom_matiere) FROM matiere WHERE idClasse = ?";
+
+	    try (
+	        PreparedStatement ps1 = con.prepareStatement(query1);
+	        PreparedStatement ps3 = con.prepareStatement(query3);
+	        PreparedStatement ps2 = con.prepareStatement(query2)
+	    ) {
+	        // Récupération de l'ID de la classe
+	        ps1.setString(1, className);
+	        ResultSet rs1 = ps1.executeQuery();
+
+	        int classID = -1;
+	        if (rs1.next()) {
+	            classID = rs1.getInt("idClasse");
+	        } else {
+	            System.out.println("ERREUR: La classe '" + className + "' n'existe pas.");
+	            return;
+	        }
+
+	        // Vérification du nombre de matières
+	        ps3.setInt(1, classID);
+	        ResultSet rs2 = ps3.executeQuery();
+	        rs2.next();
+	        int matiereCount = rs2.getInt(1);
+
+	        if (matiereCount >= 14) {
+	            System.out.println("WARNING: cette classe possède suffisamment de matières (" + matiereCount + ").");
+	        } else {
+	            // Insertion de la matière
+	            ps2.setString(1, nomMatiere);
+	            ps2.setInt(2, classID);
+	            ps2.executeUpdate();
+	            System.out.println("SUCCESS: Matière '" + nomMatiere + "' enregistrée !");
+	        }
+
+	        // Fermeture des ResultSet
+	        rs1.close();
+	        rs2.close();
+	    }
 	}
+
 	// verify if exist classroom
 	protected static boolean verifyClassroom(String className, Connection con) throws SQLException {
 	    String query = "SELECT 1 FROM Classe WHERE nom = ?";
@@ -168,7 +181,7 @@ public class QueryFunction {
 		//select classroom id
 		String query1 = "SELECT idClasse FROM Classe WHERE nom=?"; 
 		// count matiere
-		String query2 = "SELECT DISTINCT COUNT(nom_matiere) WHERE idClasse=?";
+		String query2 = "SELECT DISTINCT COUNT(nom_matiere) FROM matiere WHERE idClasse=?";
 		
 		PreparedStatement pstmt1 = con.prepareStatement(query1);
 		pstmt1.setString(1, classroom);
@@ -192,7 +205,7 @@ public class QueryFunction {
 		return someMat;
 	}
 	// insert timestable
-	protected static void insertTimeTable(String classroom, String anneScolaire, Connection con) throws SQLException{
+	protected static void insertTimeTable(String classroom, Connection con) throws SQLException{
 		
 	}
 	

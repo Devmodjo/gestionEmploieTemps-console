@@ -47,13 +47,13 @@ public class Main extends QueryFunction {
 						System.out.println("ERROR: cette classe n'existe pas");
 					}else {
 						if(countMatiere(classname,db) <10 ) {
-							System.out.println("ERROR: cette classe ne possède pas suffisament de matière pour former un emploie de temp");
+							System.out.println("WARNING: cette classe ne possède pas suffisament de matière pour former un emploie de temp");
 						}else {
 							// creation de l'emploie de temps
+							System.out.println("création de l'emploie de temps en cours...\n");
+							
 						}
 					}
-						
-					
 				
 					break;
 				case "4":
@@ -79,7 +79,6 @@ public class Main extends QueryFunction {
 					} else {
 						System.out.println("ERROR: cette classe n'existe pas");
 					}
-					
 					
 					
 					break;

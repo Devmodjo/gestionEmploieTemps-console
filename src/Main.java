@@ -43,9 +43,18 @@ public class Main extends QueryFunction {
 					System.out.println("matieres disponible pour la "+classname+"");
 					System.out.println(viewMatiere(classname, db)+"\n");
 					
-					System.out.print("année scolaire (ex: 2022/2023) : ");
-					String years = sc.next();
+					if(!verifyClassroom(classname, db)) {
+						System.out.println("ERROR: cette classe n'existe pas");
+					}else {
+						if(countMatiere(classname,db) <10 ) {
+							System.out.println("ERROR: cette classe ne possède pas suffisament de matière pour former un emploie de temp");
+						}else {
+							// creation de l'emploie de temps
+						}
+					}
+						
 					
+				
 					break;
 				case "4":
 					System.out.println("option indisponible");
@@ -68,7 +77,7 @@ public class Main extends QueryFunction {
 							insertMatiere(className, nameMat, db);
 						}
 					} else {
-						System.out.println("cette classe n'existe pas");
+						System.out.println("ERROR: cette classe n'existe pas");
 					}
 					
 					

@@ -24,14 +24,12 @@ public class QueryFunction {
 			String emploieTempClasse = "CREATE TABLE IF NOT EXISTS EmploiTempsClasse ("
 					+ "    idEmploiTempsClasse INTEGER PRIMARY KEY AUTOINCREMENT,"
 					+ "    idClasse INTEGER NOT NULL,"
-					+ "    idAnneeScolaire INTEGER NOT NULL,"
 					+ "    lundiCours TEXT,   "
 					+ "    mardiCours TEXT,"
 					+ "    mercrediCours TEXT,"
 					+ "    jeudiCours TEXT,"
 					+ "    vendrediCours TEXT,"
 					+ "    FOREIGN KEY (idClasse) REFERENCES Classe(idClasse),"
-					+ "    FOREIGN KEY (idAnneeScolaire) REFERENCES anneScolaire(idAnneeScolaire)"
 					+ ");";
 			stmt.execute(emploieTempClasse);
 			// create classroom table
@@ -111,7 +109,6 @@ public class QueryFunction {
 				classID = rs.getInt("idClasse");
 			
 			
-			
 			ResultSet rs2 = stmt.executeQuery(query3);
 			if(rs2.getInt(1) > 14) {
 				System.out.println("INFO: cette classe possede suffisament de matière");
@@ -165,6 +162,34 @@ public class QueryFunction {
 		}
 		
 		return ListOfMat;
+	}
+	// count number mat
+	protected static int countMatiere(String classroom, Connection con) throws SQLException{
+		//select classroom id
+		String query1 = "SELECT idClasse FROM Classe WHERE nom=?"; 
+		// count matiere
+		String query2 = "SELECT DISTINCT COUNT(nom_matiere) WHERE idClasse=?";
+		
+		PreparedStatement pstmt1 = con.prepareStatement(query1);
+		pstmt1.setString(1, classroom);
+		
+		// select classroom id
+		ResultSet res1 = pstmt1.executeQuery();
+		int idClass = res1.getInt("idClasse");
+		
+		//count number mat by class
+		PreparedStatement pstmt2 = con.prepareStatement(query2);
+		pstmt2.setInt(1, idClass);
+		
+		ResultSet res2 = pstmt2.executeQuery();
+		int someMat = res2.getInt(1);
+		
+		res2.close();
+		pstmt2.close();
+		res1.close();
+		pstmt1.close();
+		
+		return someMat;
 	}
 	// insert timestable
 	protected static void insertTimeTable(String classroom, String anneScolaire, Connection con) throws SQLException{

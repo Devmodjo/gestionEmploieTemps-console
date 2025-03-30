@@ -11,6 +11,7 @@ public class QueryFunction {
 	
 	public static int classID;
 	public static int matID;
+	public static boolean findClass = false;
 	
 	protected static Connection connect() {
 		Connection con = null; 
@@ -101,7 +102,7 @@ public class QueryFunction {
 		// insert matière
 		String query2 = "INSERT INTO matiere(nom_matiere, idClasse) VALUES(?,?)";
 		// count all mat
-		String query3 = "SELECT COUNT(nom_matiere) FROM matiere";
+		String query3 = "SELECT DISTINCT COUNT(nom_matiere) FROM matiere";
 		
 		try(Statement stmt = con.createStatement(); PreparedStatement ps = con.prepareStatement(query2)){
 			
@@ -109,20 +110,41 @@ public class QueryFunction {
 			while (rs.next()) 
 				classID = rs.getInt("idClasse");
 			
+			
+			
 			ResultSet rs2 = stmt.executeQuery(query3);
-			if(rs2.getInt(1) > 14)
+			if(rs2.getInt(1) > 14) {
 				System.out.println("INFO: cette classe possede suffisament de matière");
-			else
+			}
+			else {
 				// insertion de la matière
 				ps.setString(1, nomMatiere);
 				ps.setInt(2, classID);
 				ps.execute();
+				System.out.println("SUCCESS: Matière "+ nomMatiere+" enregistrez :) !");
+			}	
+			
 			rs2.close();
 			rs.close();
-			System.out.println("SUCCESS: Matière "+ nomMatiere+" enregistrez :) !");
+			
 			
 		}
 	}
+	// verify if exist classroom
+	protected static boolean verifyClassroom(String className, Connection con) throws SQLException {
+	    String query = "SELECT 1 FROM Classe WHERE nom = ?";
+	    PreparedStatement pstmt = con.prepareStatement(query);
+	    pstmt.setString(1, className);
+	    
+	    ResultSet rs = pstmt.executeQuery();
+	    boolean exists = rs.next(); // Vérifie si une ligne a été retournée
+
+	    rs.close();
+	    pstmt.close();
+	    
+	    return exists;
+	}
+
 	// view all matiere by classroom
 	protected static List<String> viewMatiere(String classroom, Connection con) throws SQLException{
 		String query1 = "SELECT DISTINCT idClasse FROM Classe WHERE nom='" + classroom+"'";

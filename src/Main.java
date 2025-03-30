@@ -60,11 +60,18 @@ public class Main extends QueryFunction {
 					System.out.print("combien de matière voulez-vous enregistrez ? ");
 					int numberMat = sc.nextInt();
 					
-					for(int i = 0; i<numberMat; i++) {
-						System.out.print("matière "+ i+1 +": ");
-						String nameMat = sc.next();
-						insertMatiere(className, nameMat, db);
+					if(verifyClassroom(className, db) == true) {
+						
+						for(int i = 0; i<numberMat; i++) {
+							System.out.print("matière "+ i +": ");
+							String nameMat = sc.next();
+							insertMatiere(className, nameMat, db);
+						}
+					} else {
+						System.out.println("cette classe n'existe pas");
 					}
+					
+					
 					
 					break;
 				default:

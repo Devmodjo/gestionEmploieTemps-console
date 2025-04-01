@@ -71,19 +71,17 @@ public class Main extends QueryFunction {
 							
 							String[] jour = {"lundi","mardi","mercredi", "jeudi", "vendredi" };
 							// remplir le tableau de matière
-							int compt =1;
 							for(int i = 0; i< week.length; i++) {
 								System.out.println("jour : " + jour[i]);
 								for(int j=0; j<week[i].length; j++) {
 									
-									System.out.print("periode " + compt +": ");
-									week[i][j] = sc.nextLine();
-									compt++;
+									System.out.print("periode " + (j+1) +": ");
+									week[i][j] = sc.next();
+									
 								}
 							}
-							
-							
-							//System.out.println("création de l'emploie de temps en cours...\n");
+							// enregistrement de l'mploie de temps dans la BDD
+							insertEmploiTemps(classname, week, db);
 						}
 					}
 				

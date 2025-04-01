@@ -206,16 +206,65 @@ public class QueryFunction {
 	}
 	
 	// insert timestable
-	protected static void insertTimeTable(String classroom,Connection con, String[][] week) throws SQLException{
-		
-		String query = "SELECT idClasse FROM Classe WHERE nom=?";
-		PreparedStatement pstmt1 = con.prepareStatement(query);
+	protected static void insertEmploiTemps(String className, String[][] week, Connection db) throws SQLException{
+	    // Convertir chaque ligne du tableau en une chaîne de caractères
+	    String lundi = String.join(";", week[0]);
+	    String mardi = String.join(";", week[1]);
+	    String mercredi = String.join(";", week[2]);
+	    String jeudi = String.join(";", week[3]);
+	    String vendredi = String.join(";", week[4]);
+	    
+	    // requete pour selectionnez l'identifiant d'une classe
+	    String sql0 = "SELECT idClasse FROM Classe WHERE nom=?";
+	    PreparedStatement pstmt1 = db.prepareStatement(sql0);
+		pstmt1.setString(1, className);
 		ResultSet res1 = pstmt1.executeQuery();
 		int idClass = res1.getInt("idClasse");
 		
-		res1.close();
-		pstmt1.close();
-		
+	    // Requête SQL pour insérer l'emploi du temps
+	    String sql = "INSERT INTO EmploiTempsClasse (idClasse, lundiCours, mardiCours, mercrediCours, jeudiCours, vendrediCours) VALUES (?, ?, ?, ?, ?, ?)";
+
+	    try (PreparedStatement pstmt = db.prepareStatement(sql)) {
+	        pstmt.setInt(1, idClass);
+	        pstmt.setString(2, lundi);
+	        pstmt.setString(3, mardi);
+	        pstmt.setString(4, mercredi);
+	        pstmt.setString(5, jeudi);
+	        pstmt.setString(6, vendredi);
+
+	        // Exécuter l'insertion
+	        int rowsInserted = pstmt.executeUpdate();
+	        if (rowsInserted > 0) {
+	            System.out.println("Emploi du temps inséré avec succès !");
+	        } else {
+	            System.out.println("Erreur lors de l'insertion !");
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Erreur SQL : " + e.getMessage());
+	    }finally {
+	    	pstmt1.close();
+	    	res1.close();
+	    }
 	}
+	
+	public String[] getJournee(String className, String jour, Connection db) {
+	    String sql = "SELECT " + jour + " FROM emplois_temps WHERE classe = ?";
+
+	    try (PreparedStatement pstmt = db.prepareStatement(sql)) {
+	        pstmt.setString(1, className);
+	        ResultSet rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            String matieres = rs.getString(jour); // Ex: "Math;Français;Histoire"
+	            return matieres.split(";"); // Convertir en tableau
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Erreur SQL : " + e.getMessage());
+	    }
+
+	    return new String[0]; // Retourne un tableau vide si la classe ou le jour n'existe pas
+	}
+
+
 	
 }

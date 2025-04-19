@@ -88,7 +88,15 @@ public class Main extends QueryFunction {
                     break;
 
                 case "4":
-                    System.out.println("Option indisponible pour le moment.");
+                    System.out.println("                 ***Consultation des emploie de temps***\n");
+                    System.out.println(viewClassroom(db));
+                    System.out.print("selection la classe dont vous voulez consultez l'emploie de temps : ");
+                    String classs = sc.next();
+                    if(verifyClassroom(classs, db) == true) {
+                    	getEmploiTemps(classs, db);
+                    }else {
+                    	System.out.println("WARNING: cette classe n'existe pas");
+                    }
                     break;
 
                 case "5":

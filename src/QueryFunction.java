@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class QueryFunction {
@@ -247,6 +248,7 @@ public class QueryFunction {
 	    }
 	}
 	
+	// recuperere emploie temps d'une journée
 	public String[] getJournee(String className, String jour, Connection db) {
 	    String sql = "SELECT " + jour + " FROM emplois_temps WHERE classe = ?";
 
@@ -264,7 +266,43 @@ public class QueryFunction {
 
 	    return new String[0]; // Retourne un tableau vide si la classe ou le jour n'existe pas
 	}
+	// recupere emploie de temps de toute un classe
+	protected static void getEmploiTemps(String className, Connection db) throws SQLException {
+		
+		String sql0 = "SELECT idClasse FROM Classe WHERE nom=?";
+	    PreparedStatement pstmt1 = db.prepareStatement(sql0);
+		pstmt1.setString(1, className);
+		ResultSet res1 = pstmt1.executeQuery();
+		
+		int idClass = res1.getInt("idClasse");
+		
+	    String sql = "SELECT * FROM EmploiTempsClasse WHERE idClasse = ?";
 
+	    try (PreparedStatement pstmt = db.prepareStatement(sql)) {
+	        pstmt.setInt(1, idClass);
+	        ResultSet rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            String[] jours = {"lundiCours", "mardiCours", "mercrediCours", "jeudiCours", "vendrediCours"};
+
+	            System.out.println("Emploi du temps de la classe " + className + " :\n");
+
+	            for (String jour : jours) {
+	                String matieres = rs.getString(jour); // Ex: "Math;Français;Histoire"
+	                String[] matieresArray = matieres.split(";"); // Convertir en tableau
+	                
+	                System.out.print(jour.substring(0, 1).toUpperCase() + jour.substring(1) + ": ");
+	                System.out.println(Arrays.toString(matieresArray)); // Affichage sous forme de liste
+	            }
+	        } else {
+	            System.out.println("Aucun emploi du temps trouvé pour cette classe.");
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Erreur SQL : " + e.getMessage());
+	    }
+	}
+
+	
 
 	
 }
